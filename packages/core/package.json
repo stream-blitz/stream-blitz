@@ -1,0 +1,23 @@
+{
+  "name": "@stream-blitz/core",
+  "version": "0.0.1",
+  "module": "server/index.mjs",
+  "author": "Jason Lengstorf <jason@lengstorf.com> (https://lengstorf.com)",
+  "license": "MIT",
+  "scripts": {
+    "start": "node --require 'dotenv/config' server/index.mjs"
+  },
+  "engines": {
+    "node": ">=13.2.0"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "comfy.js": "^1.0.13",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "pino": "^5.14.0",
+    "pino-pretty": "^3.4.0",
+    "uuid-apikey": "^1.4.6",
+    "ws": "^7.2.0"
+  }
+}
