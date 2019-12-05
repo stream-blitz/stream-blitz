@@ -1,6 +1,5 @@
 import auth0 from 'auth0-js';
 import { navigate } from 'gatsby';
-import axios from 'axios';
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -9,6 +8,7 @@ const auth = isBrowser
       domain: process.env.AUTH0_DOMAIN,
       clientID: process.env.AUTH0_CLIENTID,
       redirectUri: process.env.AUTH0_REDIRECT_URI,
+      audience: process.env.AUTH0_AUDIENCE,
       responseType: 'token id_token',
       scope: 'openid profile email',
     })
@@ -25,8 +25,6 @@ let user = {};
 export const isAuthenticated = () => {
   if (!isBrowser) return;
 
-  console.log({ tokens });
-
   return localStorage.getItem('isLoggedIn') === 'true';
 };
 
@@ -35,20 +33,6 @@ export const login = () => {
 
   auth.authorize();
 };
-
-// TODO we probably don’t need this in the UI, actually
-// checking on the API keeps the tokens more secure and
-// lets us check on each command instantiation, which is
-// maybe slower but I _think_ is more secure
-const getTwitchToken = userID =>
-  axios
-    .post('/.netlify/functions/get-twitch-access-token', { id: userID })
-    .then(result => {
-      console.log({ result });
-      return result;
-    })
-    .then(result => result.data)
-    .catch(error => console.error(error));
 
 const setSession = (cb = () => {}) => async (err, authResult) => {
   if (err) {
@@ -62,13 +46,7 @@ const setSession = (cb = () => {}) => async (err, authResult) => {
     tokens.accessToken = authResult.accessToken;
     tokens.idToken = authResult.idToken;
     tokens.expiresAt = expiresAt;
-
-    const twitchToken = await getTwitchToken(authResult.idTokenPayload.sub);
-    user = {
-      ...authResult.idTokenPayload,
-      twitch: { accessToken: twitchToken },
-    };
-
+    user = authResult.idTokenPayload;
     localStorage.setItem('isLoggedIn', true);
     navigate('/account');
     cb();
@@ -82,6 +60,8 @@ export const handleAuthentication = () => {
 };
 
 export const getProfile = () => user;
+
+export const getAccessToken = () => tokens.accessToken;
 
 export const silentAuth = callback => {
   if (!isAuthenticated()) {
