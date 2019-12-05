@@ -43,8 +43,8 @@ Stream Blitz is a service designed to make adding sound effects to your Twitchâ„
 ## TODO
 
 - [ ] Add a UI 
-  - [ ] auth with Twitch
-  - [ ] get an API key
+  - [x] auth with Twitch
+  - [ ] get an API key (in progress)
   - [ ] register commands using serverless handlers
   - [ ] register commands via UI only
   - [ ] register chat handlers

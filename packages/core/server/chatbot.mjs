@@ -8,10 +8,7 @@ const logger = getLogger('chatbot');
 
 let commands;
 
-const init = () => {
-  // load the commands into memory
-  commands = await getCommands({ channel: extra.channel });
-
+const init = async () => {
   // load the channels registered with the service
   const channelsResult = await graphql(
     `
@@ -27,7 +24,7 @@ const init = () => {
 
   logger.debug('initializing the chatbot on the following channels:', channels);
   comfy.Init(process.env.TWITCH_BOT_USER, process.env.TWITCH_OAUTH, channels);
-}
+};
 
 const handleChat = () => {
   // TODO how should this work?
@@ -37,7 +34,6 @@ const handleChat = () => {
   //     id,
   //     count: extra.messageEmotes[id].length,
   //   }));
-
   //   if (emotes.length > 0) {
   //     sendMessage({
   //       type: 'chat',
@@ -46,11 +42,12 @@ const handleChat = () => {
   //     });
   //   }
   // };
-}
+};
 
 const handleCommands = () => {
   comfy.onCommand = async (user, command, message, flags, extra) => {
-    
+    // load the commands from memory if available or from the DB
+    commands = commands || (await getCommands({ channel: extra.channel }));
     const { handler } = commands.find(c => c.name === command);
 
     if (!handler) return;
@@ -75,7 +72,7 @@ const handleCommands = () => {
 
     comfy.Say(cmd.message, cmd.channel);
   };
-}
+};
 
 export default async () => {
   init();

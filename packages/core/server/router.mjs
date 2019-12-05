@@ -1,10 +1,10 @@
 import { join } from 'path';
 import express from 'express';
+import cors from 'cors';
 import auth from './auth.mjs';
 import getLogger from './logger.mjs';
 import { sendMessage } from './socket.mjs';
 import { getCommands, runHandler } from './commands.mjs';
-import axios from 'axios';
 
 const logger = getLogger('router');
 
@@ -15,6 +15,8 @@ const app = express();
 // serve the overlay as static files
 app.use(express.json());
 app.use(express.static(join(process.cwd(), 'client')));
+
+app.use(cors());
 
 // handle incoming command requests
 app.post('/commands/trigger', auth, async (req, res) => {
@@ -41,7 +43,8 @@ app.post('/commands/trigger', auth, async (req, res) => {
 });
 
 app.post('/commands/list', auth, async (req, res) => {
-  const { channel } = JSON.parse(req.body);
+  console.log(req.body);
+  const { channel } = req.body;
   const commands = await getCommands({ channel });
 
   res.json(commands);
