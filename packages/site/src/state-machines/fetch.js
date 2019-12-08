@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const getUserCommands = async ({ user, token }) => {
   const commands = await axios.post(
-    `${process.env.STREAM_BLITZ_API}/commands/list`,
+    `${process.env.GATSBY_STREAM_BLITZ_API}/commands/list`,
     { channel: user.name },
     {
       headers: {

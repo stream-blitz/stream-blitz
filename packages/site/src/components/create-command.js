@@ -17,7 +17,7 @@ const CreateCommand = ({ send }) => {
 
     const { name } = getProfile();
 
-    post(`${process.env.STREAM_BLITZ_API}/commands/create`, {
+    post(`${process.env.GATSBY_STREAM_BLITZ_API}/commands/create`, {
       ...values,
       channel: name,
     }).then(() => {
