@@ -5,7 +5,7 @@ exports.onCreatePage = ({ page, actions }) => {
   }
 };
 
-exports.onCreateWebpackConfig = ({ stage, loader, actions }) => {
+exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
   if (stage === 'build-html') {
     actions.setWebpackConfig({
       module: {
