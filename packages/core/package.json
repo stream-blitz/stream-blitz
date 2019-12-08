@@ -7,9 +7,6 @@
   "scripts": {
     "start": "node --require 'dotenv/config' server/index.mjs"
   },
-  "engines": {
-    "node": ">=13.2.0"
-  },
   "dependencies": {
     "axios": "^0.19.0",
     "basic-auth": "^2.0.1",
