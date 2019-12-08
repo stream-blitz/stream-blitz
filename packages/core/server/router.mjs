@@ -5,6 +5,7 @@ import auth from './auth.mjs';
 import getLogger from './logger.mjs';
 import { sendMessage } from './socket.mjs';
 import { getCommands, runHandler } from './commands.mjs';
+import { upsertCommand } from './commands.mjs';
 
 const logger = getLogger('router');
 
@@ -42,8 +43,14 @@ app.post('/commands/trigger', auth, async (req, res) => {
   res.send('ok');
 });
 
+app.post('/commands/create', auth, async (req, res) => {
+  const { channel, name, handler } = req.body;
+  const command = await upsertCommand({ channel, name, handler });
+
+  res.json(command);
+});
+
 app.post('/commands/list', auth, async (req, res) => {
-  console.log(req.body);
   const { channel } = req.body;
   const commands = await getCommands({ channel });
 
