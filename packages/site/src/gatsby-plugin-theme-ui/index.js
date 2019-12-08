@@ -1,6 +1,7 @@
 export default {
   colors: {
     text: '#333',
+    muted: '#666',
     heading: 'hsl(220, 70%, 5%)',
     background: '#fff',
     primary: 'hsl(220, 80%, 70%)',

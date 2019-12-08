@@ -1,40 +1,31 @@
 /** @jsx jsx */
 import { jsx } from 'theme-ui';
-import Container from './container';
-import { useEffect, useState } from 'react';
+import { useMachine } from '@xstate/react';
+import fetchMachine from '../state-machines/fetch';
 import { getProfile, getAccessToken } from '../utils/auth';
+import Container from './container';
+import Overlay from './overlay';
+import Commands from './commands';
+import CreateCommand from './create-command';
 
 const AccountDashboard = () => {
-  const [commands, setCommands] = useState([]);
-  useEffect(() => {
-    const user = getProfile();
-
-    fetch('http://localhost:9999/commands/list', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${getAccessToken()}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ channel: user.name }),
-    })
-      .then(res => res.json())
-      .then(commands => {
-        setCommands(commands);
-      });
-  }, []);
+  const [state, send] = useMachine(fetchMachine, {
+    context: { user: getProfile(), token: getAccessToken(), commands: [] },
+  });
 
   return (
     <Container>
       <h1>Dashboards</h1>
-      <section>
-        <h2>Your Commands</h2>
-        <ul>
-          {commands.map(command => (
-            <li key={command.id}>
-              <strong>{command.name}</strong> ({command.handler})
-            </li>
-          ))}
-        </ul>
+      <section
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 30%)',
+          gridGap: '3%',
+        }}
+      >
+        <CreateCommand send={send} />
+        <Commands state={state} />
+        <Overlay state={state} />
       </section>
     </Container>
   );
