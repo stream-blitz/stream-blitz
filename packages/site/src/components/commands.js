@@ -9,7 +9,7 @@ const Commands = ({ state }) => {
 
   return (
     state.matches('loaded') && (
-      <div>
+      <div sx={{ gridArea: 'main' }}>
         <h2>Your Commands</h2>
         {state.context.commands.length > 0 ? (
           <ul
@@ -25,6 +25,11 @@ const Commands = ({ state }) => {
                 <details>
                   <summary>
                     <strong>{command.name}</strong>
+                    {command.details.description && (
+                      <span sx={{ display: 'block', pl: 3, fontSize: 0 }}>
+                        {command.details.description}
+                      </span>
+                    )}
                   </summary>
 
                   <ul sx={{ listStyle: 'none', mt: 3, pl: 3 }}>
@@ -45,13 +50,6 @@ const Commands = ({ state }) => {
                             message in chat:
                             <br />
                             <code>{command.details.message}</code>
-                          </li>
-                        )}
-                        {command.details.description && (
-                          <li>
-                            Command description:
-                            <br />
-                            <p>{command.details.description}</p>
                           </li>
                         )}
                         {command.details.sfx && (

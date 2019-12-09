@@ -19,8 +19,12 @@ const AccountDashboard = () => {
       <section
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 30%)',
-          gridGap: '3%',
+          gridTemplateAreas: `
+            "widget1 main"
+            "widget2 main"
+            "widget3 main"`,
+          gridTemplateColumns: '220px auto',
+          gridGap: '20px',
         }}
       >
         <CreateCommand send={send} />

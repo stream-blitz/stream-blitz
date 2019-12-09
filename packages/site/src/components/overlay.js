@@ -3,7 +3,7 @@ import { jsx } from 'theme-ui';
 
 const Overlay = ({ state }) => {
   return (
-    <div>
+    <div sx={{ gridArea: 'widget2' }}>
       <h2>Your Overlay URL</h2>
       <p>
         Add the following URL as a browser source in your streaming software to
@@ -11,7 +11,7 @@ const Overlay = ({ state }) => {
       </p>
       <input
         type="url"
-        value={`https://overlay.streamblitz.com/?channel=${state.context.user.name}`}
+        value={`https://api.streamblitz.com/?channel=${state.context.user.name}`}
         disabled
         sx={{
           border: t => `1px solid ${t.colors.primary}`,
