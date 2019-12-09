@@ -48,11 +48,11 @@ const handleCommands = () => {
   comfy.onCommand = async (user, command, message, flags, extra) => {
     // load the commands from memory if available or from the DB
     commands = commands || (await getCommands({ channel: extra.channel }));
-    const cmd = commands.find(c => c.name === command);
+    const currentCommand = commands.find(c => c.name === command);
 
-    if (!cmd) return;
+    if (!currentCommand) return;
 
-    const { handler } = cmd;
+    const { handler } = currentCommand;
 
     if (!handler) return;
 
