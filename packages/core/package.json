@@ -1,6 +1,7 @@
 {
   "name": "@stream-blitz/core",
   "version": "0.0.1",
+  "type": "module",
   "module": "server/index.mjs",
   "author": "Jason Lengstorf <jason@lengstorf.com> (https://lengstorf.com)",
   "license": "MIT",
