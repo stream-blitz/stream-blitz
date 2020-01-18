@@ -2,7 +2,6 @@
 import { jsx } from 'theme-ui';
 import { useState } from 'react';
 import { post } from '../utils/api';
-import { getProfile } from '../utils/auth';
 
 const INITIAL_VALUES = { name: '', handler: '' };
 const CreateCommand = ({ send }) => {
@@ -15,11 +14,12 @@ const CreateCommand = ({ send }) => {
   const handleSubmit = event => {
     event.preventDefault();
 
-    const { name } = getProfile();
+    // const { name } = getProfile();
 
     post(`${process.env.GATSBY_STREAM_BLITZ_API}/commands/create`, {
       ...values,
-      channel: name,
+      // TODO load name
+      channel: 'jlengstorf',
     }).then(() => {
       send('RELOAD');
       setValues(INITIAL_VALUES);

@@ -4,18 +4,13 @@ import { Router } from '@reach/router';
 import { Link } from 'gatsby';
 import Layout from '../components/layout';
 import AccountDashboard from '../components/account-dashboard';
-import { login, isAuthenticated, getProfile, logout } from '../utils/auth';
 
 const Settings = () => <p>Settings</p>;
 const Billing = () => <p>Billing</p>;
 
 const Account = () => {
-  if (!isAuthenticated()) {
-    login();
-    return <p>Redirecting to login...</p>;
-  }
-
-  const user = getProfile();
+  // TODO load user info
+  const user = {};
 
   return (
     <Layout>
@@ -47,14 +42,12 @@ const Account = () => {
         <Link activeClassName="active" to="/account/billing">
           Billing
         </Link>
-        {user.name && (
-          <span sx={{ fontSize: 0, mr: 2 }}>oh hey {user.name}</span>
-        )}
+
         <button
           sx={{ ml: 'auto' }}
           onClick={event => {
             event.preventDefault();
-            logout();
+            // TODO log out
           }}
         >
           Log Out

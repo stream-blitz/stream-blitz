@@ -2,7 +2,6 @@
 import { jsx } from 'theme-ui';
 import { useMachine } from '@xstate/react';
 import fetchMachine from '../state-machines/fetch';
-import { getProfile, getAccessToken } from '../utils/auth';
 import Container from './container';
 import Overlay from './overlay';
 import Commands from './commands';
@@ -10,7 +9,7 @@ import CreateCommand from './create-command';
 
 const AccountDashboard = () => {
   const [state, send] = useMachine(fetchMachine, {
-    context: { user: getProfile(), token: getAccessToken(), commands: [] },
+    context: { user: {}, token: {}, commands: [] },
   });
 
   return (
