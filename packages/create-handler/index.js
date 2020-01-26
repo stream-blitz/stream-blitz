@@ -23,6 +23,6 @@ module.exports = sfxHandler => async event => {
       'Access-Control-Allow-Origin': '*',
       'X-Stream-Blitz-Handler-Version': pkg.version,
     },
-    body: JSON.stringify(response),
+    body: JSON.stringify({ ...response, channel: extra.channel }),
   };
 };

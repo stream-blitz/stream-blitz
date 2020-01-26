@@ -27,8 +27,8 @@ const handleCommand = async msg => {
   const duration = (msg.duration || 4) * 1000;
 
   // play audio if the command has any
-  if (msg.sfx) {
-    playSound(msg.sfx);
+  if (msg.audio) {
+    playSound(msg.audio);
 
     // set a cooldown period to avoid being too noisy
     commandsOnTimeOut.set(msg.name, true);
@@ -37,11 +37,11 @@ const handleCommand = async msg => {
     }, CMD_COOLDOWN);
   }
 
-  // show a GIF if the command has one
-  if (msg.gif) {
+  // show an image if the command provides one
+  if (msg.image) {
     const img = cmdDisplay.querySelector('img');
     img.classList.add('command-image', 'visible');
-    img.src = msg.gif;
+    img.src = msg.image;
 
     const text = cmdDisplay.querySelector('text');
     text.innerText = `${msg.user} redeemed ${msg.name}`;
