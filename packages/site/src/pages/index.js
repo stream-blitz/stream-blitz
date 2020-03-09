@@ -51,7 +51,6 @@ export default () => {
       {state.matches({ display: 'loaded' }) && (
         <>
           <ul>
-            {console.log(state.context)}
             {state.context.effects.map(({ name }) => (
               <li key={name}>
                 <Effect
