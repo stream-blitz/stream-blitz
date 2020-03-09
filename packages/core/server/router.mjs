@@ -1,11 +1,12 @@
 import { join } from 'path';
 import express from 'express';
 import cors from 'cors';
-import auth from './auth.mjs';
+import initializeChatbot from './chatbot.mjs';
 import getLogger from './logger.mjs';
 import { sendMessage } from './socket.mjs';
 import { getCommands, runHandler } from './commands.mjs';
-import { upsertCommand } from './commands.mjs';
+
+let ACTIVE_CHANNELS = new Set();
 
 const logger = getLogger('router');
 
@@ -13,14 +14,30 @@ logger.debug('initializing router...');
 
 const app = express();
 
-// serve the overlay as static files
 app.use(express.json());
-app.use(express.static(join(process.cwd(), 'client')));
+
+// start the chatbot, then serve the overlay static files
+app.use('/overlay', (req, _res, next) => {
+  if (ACTIVE_CHANNELS.has(req.query.channel)) {
+    next();
+    return;
+  }
+
+  try {
+    ACTIVE_CHANNELS.add(req.query.channel);
+    initializeChatbot([...ACTIVE_CHANNELS]);
+  } catch (error) {
+    console.error(error);
+  }
+
+  next();
+});
+app.use('/overlay', express.static(join(process.cwd(), 'client')));
 
 app.use(cors());
 
 // handle incoming command requests
-app.post('/commands/trigger', auth, async (req, res) => {
+app.post('/commands/trigger', async (req, res) => {
   const msg = req.body;
   const commands = await getCommands({ channel: msg.channel });
   const command = commands.find(cmd => cmd.name === msg.command);
@@ -43,14 +60,7 @@ app.post('/commands/trigger', auth, async (req, res) => {
   res.send('ok');
 });
 
-app.post('/commands/create', auth, async (req, res) => {
-  const { channel, name, handler } = req.body;
-  const command = await upsertCommand({ channel, name, handler });
-
-  res.json(command);
-});
-
-app.post('/commands/list', auth, async (req, res) => {
+app.post('/commands/list', async (req, res) => {
   const { channel } = req.body;
   const commands = await getCommands({ channel });
 
