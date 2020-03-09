@@ -1,16 +1,7 @@
-import { Machine, send, spawn, assign } from 'xstate';
+import { Machine, spawn, assign } from 'xstate';
 import gql from 'graphql-tag';
 import { auth } from '../utils/auth';
 import { client } from '../utils/client';
-
-const checkAuth = async () => {
-  const [twitchAuth, netlifyAuth] = await Promise.all([
-    auth.isLoggedIn('twitch-tv'),
-    auth.isLoggedIn('netlify'),
-  ]);
-
-  return twitchAuth && netlifyAuth;
-};
 
 const getAuth = async service => {
   // do we already have the auth for this?
@@ -79,7 +70,7 @@ const getNetlifySites = async () => {
   return result.data.netlify.sites;
 };
 
-const loadEffects = async siteID => {
+const loadEffects = async ({ site }) => {
   const result = await client.query({
     query: gql`
       query($siteID: String!) {
@@ -95,7 +86,7 @@ const loadEffects = async siteID => {
         }
       }
     `,
-    variables: { siteID },
+    variables: { siteID: site },
   });
 
   return {
@@ -107,7 +98,6 @@ const loadEffects = async siteID => {
 };
 
 const saveNetlifySiteID = async ({ userID, siteID }) => {
-  console.log({ siteID, userID });
   const result = await client.mutate({
     mutation: gql`
       mutation AddSettings($userID: String!, $siteID: String!) {
@@ -120,8 +110,6 @@ const saveNetlifySiteID = async ({ userID, siteID }) => {
     `,
     variables: { userID, siteID },
   });
-
-  console.log(result);
 
   return !result.errors;
 };
@@ -144,7 +132,7 @@ const effectMachine = Machine({
 
 export default Machine({
   id: 'dashboard',
-  initial: 'unknown',
+  initial: 'login',
   context: {
     userID: undefined,
     channel: undefined,
@@ -152,21 +140,7 @@ export default Machine({
     sites: [],
     effects: [],
   },
-  on: {
-    LOGIN_SUCCESS: 'configure',
-    SITE_CONFIGURED: 'display',
-  },
   states: {
-    unknown: {
-      on: {
-        '': [{ target: 'configure', cond: checkAuth }, { target: 'login' }],
-      },
-    },
-    idle: {
-      on: {
-        LOGIN: 'login',
-      },
-    },
     login: {
       initial: 'twitch',
       states: {
@@ -186,13 +160,14 @@ export default Machine({
           invoke: {
             src: getNetlifyAuth,
             onDone: {
-              actions: send('LOGIN_SUCCESS'),
+              target: '#configure-user',
             },
           },
         },
       },
     },
     configure: {
+      id: 'configure-user',
       initial: 'loading',
       invoke: {
         src: getCurrentConfig,
@@ -201,26 +176,18 @@ export default Machine({
             assign((_ctx, event) => ({
               site: event.data && event.data.site_id,
             })),
-            send('CONFIG_LOADED'),
           ],
+          target: 'display',
         },
-      },
-      on: {
-        CONFIG_LOADED: [
-          { target: 'display', cond: ctx => ctx && ctx.site },
-          { target: '.loading' },
-        ],
-        SITES_LOADED: '.setSiteID',
+        onError: '.loading',
       },
       states: {
         loading: {
           invoke: {
             src: getNetlifySites,
             onDone: {
-              actions: [
-                assign((_ctx, event) => ({ sites: event.data })),
-                send('SITES_LOADED'),
-              ],
+              actions: [assign((_ctx, event) => ({ sites: event.data }))],
+              target: 'setSiteID',
             },
           },
         },
@@ -228,7 +195,6 @@ export default Machine({
           on: {
             SET_SITE_ID: {
               actions: assign((_ctx, event) => {
-                console.log(event);
                 return { site: event.site };
               }),
               target: 'saving',
@@ -240,21 +206,24 @@ export default Machine({
             src: ctx =>
               saveNetlifySiteID({ siteID: ctx.site, userID: ctx.userID }),
             onDone: {
-              actions: send('SITE_CONFIGURED'),
+              target: '#display-effects',
             },
             onError: {
-              actions: assign((_ctx, event) => ({ errorMessage: event.data })),
+              actions: assign((_ctx, event) => ({
+                errorMessage: event.data,
+              })),
             },
           },
         },
       },
     },
     display: {
+      id: 'display-effects',
       initial: 'loading',
       states: {
         loading: {
           invoke: {
-            src: ctx => loadEffects(ctx.site),
+            src: ctx => loadEffects(ctx),
             onDone: {
               actions: assign((_ctx, event) => ({
                 effects: event.data.effects,
