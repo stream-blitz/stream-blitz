@@ -2,9 +2,14 @@ import React from 'react';
 import { useMachine } from '@xstate/react';
 import effectMachine from '../state-machines/effect';
 
-const Effect = ({ publicURL, effect, channel }) => {
+const Effect = ({ publicURL, effect, channel, userID }) => {
   const [state] = useMachine(
-    effectMachine.withContext({ channel, url: publicURL, name: effect }),
+    effectMachine.withContext({
+      channel,
+      userID,
+      url: publicURL,
+      name: effect,
+    }),
   );
 
   if (state.matches('invalid') || state.matches('failure')) {
