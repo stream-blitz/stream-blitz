@@ -1,16 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { silentAuth } from './src/utils/auth';
-
-const SessionCheck = ({ children }) => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    silentAuth(() => setLoading(false));
-  }, [loading]);
-
-  return !loading && <>{children}</>;
-};
+import React from 'react';
+import { ApolloProvider } from '@apollo/react-hooks';
+import { client } from './src/utils/client';
 
 export const wrapRootElement = ({ element }) => (
-  <SessionCheck>{element}</SessionCheck>
+  <ApolloProvider client={client}>{element}</ApolloProvider>
 );

@@ -1,82 +1,43 @@
 import axios from 'axios';
 import getLogger from './logger.mjs';
-import graphql from './graphql.mjs';
 
 const logger = getLogger('commands');
 
 export const getCommands = async ({ channel }) => {
   logger.debug('loading all commands...');
-  const result = await graphql(
-    `
-      query($channel: String!) {
-        commands(where: { channel: { _eq: $channel } }) {
-          id
-          name
-          handler
-        }
-      }
-    `,
-    {
-      channel,
-    },
-  );
-
-  logger.debug(result);
-
-  const { commands } = result.data;
-
-  logger.debug('commands loaded', commands);
-
-  return commands;
-};
-
-export const upsertCommand = async ({ channel, name, handler }) => {
-  logger.debug(`upserting a new command for ${channel}`);
-  const result = await graphql(
-    `
-      mutation(
-        $channel: String!
-        $name: String!
-        $handler: String!
-        $key: String!
-      ) {
-        upsert: insert_commands(
-          objects: {
-            channel: $channel
-            name: $name
-            handler: $handler
-            key: $key
+  const result = await axios
+    .post(
+      process.env.HASURA_GRAPHQL_URI,
+      {
+        query: `
+          query {
+            effects {
+              command
+              handler
+            }
           }
-          on_conflict: {
-            constraint: commands_key_key
-            update_columns: handler
-            where: { key: { _eq: $key } }
-          }
-        ) {
-          affected_rows
-          returning {
-            id
-            name
-            handler
-            channel
-            key
-          }
-        }
-      }
-    `,
-    {
-      channel,
-      name,
-      handler,
-      key: `${channel}.${name}`,
-    },
-  );
+        `,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'X-Hasura-Admin-Secret': process.env.HASURA_ADMIN_SECRET,
 
-  const command = result.data.upsert.returning[0];
+          // use an unauthenticated role and filter by the current channel
+          'X-Hasura-Role': 'overlay',
+          'X-Hasura-Channel': channel,
+        },
+      },
+    )
+    .then(response => response.data)
+    .catch(error => logger.error(error));
 
-  logger.debug(`command ${command.id} upserted`);
+  const { effects } = result.data;
 
-  return command;
+  logger.debug('commands loaded', effects);
+
+  return effects;
 };
 
 export const runHandler = (handler, options) =>

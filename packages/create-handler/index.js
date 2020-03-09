@@ -1,3 +1,5 @@
+const pkg = require('./package.json');
+
 module.exports = sfxHandler => async event => {
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -19,7 +21,8 @@ module.exports = sfxHandler => async event => {
     statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
+      'X-Stream-Blitz-Handler-Version': pkg.version,
     },
-    body: JSON.stringify(response),
+    body: JSON.stringify({ ...response, channel: extra.channel }),
   };
 };

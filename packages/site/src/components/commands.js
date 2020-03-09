@@ -56,6 +56,8 @@ const Commands = ({ state }) => {
                           <li>
                             The following sound effect will play:
                             <br />
+                            {/* TODO: how do we make user-submitted audio accessible? */}
+                            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                             <audio
                               sx={{ mt: 2 }}
                               controls
