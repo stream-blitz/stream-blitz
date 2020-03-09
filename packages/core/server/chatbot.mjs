@@ -1,5 +1,4 @@
 import comfy from 'comfy.js';
-import graphql from './graphql.mjs';
 import { getCommands, runHandler } from './commands.mjs';
 import { sendMessage } from './socket.mjs';
 import getLogger from './logger.mjs';
@@ -8,21 +7,8 @@ const logger = getLogger('chatbot');
 
 let commands;
 
-const init = async () => {
-  // load the channels registered with the service
-  const channelsResult = await graphql(
-    `
-      query {
-        channels {
-          name
-        }
-      }
-    `,
-  );
-
-  const channels = channelsResult.data.channels.map(c => c.name);
-
-  logger.debug('initializing the chatbot on the following channels:', channels);
+const init = async channels => {
+  logger.debug('initializing the chatbot for @', channels);
   comfy.Init(process.env.TWITCH_BOT_USER, process.env.TWITCH_OAUTH, channels);
 };
 
@@ -47,8 +33,8 @@ const handleChat = () => {
 const handleCommands = () => {
   comfy.onCommand = async (user, command, message, flags, extra) => {
     // load the commands from memory if available or from the DB
-    commands = commands || (await getCommands({ channel: extra.channel }));
-    const currentCommand = commands.find(c => c.name === command);
+    commands = await getCommands({ channel: extra.channel });
+    const currentCommand = commands.find(c => c.command === command);
 
     if (!currentCommand) return;
 
@@ -78,8 +64,8 @@ const handleCommands = () => {
   };
 };
 
-export default async () => {
-  init();
+export default async channels => {
+  init(channels);
   handleChat();
   handleCommands();
 };
