@@ -1,0 +1,66 @@
+import Layout from '../../components/layout';
+import Card from '../../components/card';
+
+export default ({ children }) => (
+  <Layout wide>
+    <Card>{children}</Card>
+  </Layout>
+);
+
+# Stream Blitz
+
+Stream Blitz is a service designed to make adding sound effects to your Twitch™ streams feel like deploying serverless functions.
+
+> ⚠️ This product is still in alpha. If you’d like to be added as an alpha tester, please contact <jason@lengstorf.com>.
+
+## How it works
+
+1. Join Stream Blitz
+2. Create a serverless handler
+3. [Deploy to Netlify](https://netlify.com/?utm_source=twitch-blitz-jl&utm_medium=github&utm_campaign=devex)
+4. Run your sound effect!
+
+### Creating a Stream Blitz serverless handler
+
+1.  Install the serverless handler util
+
+    ```bash
+    # install the handler util
+    yarn add @stream-blitz/create-handler
+    ```
+
+2.  Create a serverless function:
+
+    ```js
+    const createHandler = require('@stream-blitz/create-handler');
+
+    exports.handler = createHandler(() => ({
+      name: 'boop', // command to trigger this effect in chat, e.g. `!boop`
+      message: 'you triggered !boop Kappa', // sent to the chat by Stream Blitz
+      description: 'Information about the command', // shown in Stream Blitz
+      audio: 'https://example.org/path/to/sound.mp3', // played in your overlay
+      image: 'https://example.org/image.gif', // shown in the overlay
+      duration: 10, // how long (in seconds) to show the overlay
+    }));
+    ```
+
+    Note: only `name` is required — the rest of the fields are optional and will be omitted if left out (e.g. you can send a chat message without an overlay and vice versa)
+
+3.  Register your serverless function
+
+    Visit your [Stream Blitz dashboard](/) to pull in your effects!
+
+## API
+
+The API for `@stream-blitz/create-handler` tries to keep things as simple as possible:
+
+### Arguments
+
+The handler function receives
+
+## TODO
+
+- [ ] register chat handlers
+- [ ] register custom overlay styles
+- [ ] register custom overlay scripts
+- [ ] add support for multi-channel commands (e.g. teams opting into SFX)

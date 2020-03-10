@@ -4,7 +4,7 @@ import { jsx } from 'theme-ui';
 import { Global } from '@emotion/core';
 import { Link } from 'gatsby';
 
-const Layout = ({ children }) => (
+const Layout = ({ children, wide = false }) => (
   <Fragment>
     <Global
       styles={{
@@ -32,14 +32,25 @@ const Layout = ({ children }) => (
       >
         Stream Blitz
       </Link>
+      <Link
+        to="/docs/quickstart"
+        sx={{ color: 'heading', ml: 4, textDecoration: 'none' }}
+      >
+        Docs
+      </Link>
     </header>
     <main
       sx={{
         color: 'text',
         fontFamily: 'body',
-        maxWidth: 540,
+        maxWidth: wide ? 720 : 540,
         mx: 'auto',
         width: '90vw',
+
+        // TODO use actual MDX syntax highlighting
+        pre: {
+          overflowX: 'scroll',
+        },
       }}
     >
       {children}
