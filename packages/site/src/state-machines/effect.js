@@ -17,7 +17,7 @@ const loadEffectPayload = async ({ url, name, channel, userID }) => {
 
   // we need to save these in Hasura so the overlays can look them up without
   // needing to generate OAuth credentials
-  const mutationResult = await client
+  await client
     .mutate({
       mutation: gql`
         mutation SaveEffects(
