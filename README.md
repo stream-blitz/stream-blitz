@@ -25,32 +25,33 @@ Stream Blitz is a service designed to make adding sound effects to your Twitchâ„
     ```js
     const createHandler = require('@stream-blitz/create-handler');
 
-    exports.handler = createHandler(({ extra: { channel } }) => ({
-      name: 'blitzed',
-      message: 'KAPOW YOU GOT BLITZED! MorphinTime',
-      sfx:
-        'https://res.cloudinary.com/jlengstorf/video/upload/q_auto/v1569957993/lwj-sfx/blitzed.mp3',
-      gif:
-        'https://res.cloudinary.com/jlengstorf/image/upload/q_auto,f_auto,w_400/v1573512575/lwj-sfx/victory',
-      channel,
+    exports.handler = createHandler(() => ({
+      name: 'boop', // command to trigger this effect in chat, e.g. `!boop`
+      message: 'you triggered !boop Kappa', // sent to the chat by Stream Blitz
+      description: 'Information about the command', // shown in Stream Blitz
+      audio: 'https://example.org/path/to/sound.mp3', // played in your overlay
+      image: 'https://example.org/image.gif', // shown in the overlay
+      duration: 10, // how long (in seconds) to show the overlay
     }));
     ```
 
+    Note: only `name` is required â€” the rest of the fields are optional and will be omitted if left out (e.g. you can send a chat message without an overlay and vice versa)
+
 3.  Register your serverless function
 
-    TODO: make this self-service
+    Visit your [Stream Blitz dashboard](/) to pull in your effects!
+
+## API
+
+The API for `@stream-blitz/create-handler` tries to keep things as simple as possible:
+
+### Arguments
+
+The handler function receives
 
 ## TODO
 
-- [ ] Add a UI 
-  - [x] auth with Twitch
-  - [ ] get an API key (in progress)
-  - [ ] register commands using serverless handlers
-  - [ ] register commands via UI only
-  - [ ] register chat handlers
-  - [ ] get overlay URL
-  - [ ] register custom overlay styles
-  - [ ] register custom overlay scripts
-- [ ] add chat handling
-- [ ] add support for API key reset
+- [ ] register chat handlers
+- [ ] register custom overlay styles
+- [ ] register custom overlay scripts
 - [ ] add support for multi-channel commands (e.g. teams opting into SFX)
