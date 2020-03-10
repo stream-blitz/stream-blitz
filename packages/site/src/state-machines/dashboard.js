@@ -1,4 +1,4 @@
-import { Machine, spawn, assign } from 'xstate';
+import { Machine, assign } from 'xstate';
 import gql from 'graphql-tag';
 import { auth } from '../utils/auth';
 import { client } from '../utils/client';
@@ -50,7 +50,11 @@ const getCurrentConfig = async () => {
     `,
   });
 
-  return result.data.settings ? result.data.settings[0] : false;
+  if (result.data.settings.length === 0) {
+    throw new Error('no settings found!');
+  }
+
+  return result.data.settings[0];
 };
 
 const getNetlifySites = async () => {
@@ -113,22 +117,6 @@ const saveNetlifySiteID = async ({ userID, siteID }) => {
 
   return !result.errors;
 };
-
-const effectMachine = Machine({
-  id: 'effect',
-  initial: 'idle',
-  context: {
-    name: undefined,
-  },
-  states: {
-    idle: {
-      on: {
-        PLAY_EFFECT: 'playing',
-      },
-    },
-    playing: {},
-  },
-});
 
 export default Machine({
   id: 'dashboard',
@@ -233,15 +221,7 @@ export default Machine({
             },
           },
         },
-        loaded: {
-          entry: assign({
-            effects: ctx =>
-              ctx.effects.map(effect => ({
-                name: effect,
-                ref: spawn(effectMachine.withContext({ name: effect })),
-              })),
-          }),
-        },
+        loaded: {},
       },
     },
   },
