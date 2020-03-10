@@ -51,7 +51,7 @@ export default () => {
       {state.matches({ display: 'loaded' }) && (
         <>
           <ul>
-            {state.context.effects.map(({ name }) => (
+            {state.context.effects.map(name => (
               <li key={name}>
                 <Effect
                   publicURL={state.context.publicURL}
