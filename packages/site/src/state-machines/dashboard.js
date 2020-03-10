@@ -3,6 +3,17 @@ import gql from 'graphql-tag';
 import { auth } from '../utils/auth';
 import { client } from '../utils/client';
 
+const isLoggedIn = async () => {
+  const [twitch, netlify] = await Promise.all([
+    auth.isLoggedIn('twitch-tv'),
+    auth.isLoggedIn('netlify'),
+  ]);
+
+  if (!twitch || !netlify) {
+    throw new Error('not logged in!');
+  }
+};
+
 const getAuth = async service => {
   // do we already have the auth for this?
   let isLoggedIn = await auth.isLoggedIn(service);
@@ -120,7 +131,7 @@ const saveNetlifySiteID = async ({ userID, siteID }) => {
 
 export default Machine({
   id: 'dashboard',
-  initial: 'login',
+  initial: 'checkAuth',
   context: {
     userID: undefined,
     channel: undefined,
@@ -129,6 +140,18 @@ export default Machine({
     effects: [],
   },
   states: {
+    checkAuth: {
+      invoke: {
+        src: isLoggedIn,
+        onDone: 'login',
+        onError: 'idle',
+      },
+    },
+    idle: {
+      on: {
+        LOGIN: 'login',
+      },
+    },
     login: {
       initial: 'twitch',
       states: {
