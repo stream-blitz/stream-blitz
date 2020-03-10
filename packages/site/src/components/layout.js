@@ -8,7 +8,11 @@ const Layout = ({ children }) => (
   <Fragment>
     <Global
       styles={{
-        'html,body': { margin: 0 },
+        'html,body': {
+          background: 'hsla(220, 80%, 80%, 0.1)',
+          margin: 0,
+          minHeight: '100vh',
+        },
         '*': { boxSizing: 'border-box' },
       }}
     />
@@ -33,6 +37,9 @@ const Layout = ({ children }) => (
       sx={{
         color: 'text',
         fontFamily: 'body',
+        maxWidth: 540,
+        mx: 'auto',
+        width: '90vw',
       }}
     >
       {children}

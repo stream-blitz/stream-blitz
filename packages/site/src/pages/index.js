@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { useMachine } from '@xstate/react';
 import dashboardMachine from '../state-machines/dashboard';
 import Layout from '../components/layout';
-import Effect from '../components/effect';
+import Login from '../components/login';
+import LoggingIn from '../components/logging-in';
+import Overlay from '../components/overlay';
+import EffectsList from '../components/effects-list';
 
 export default () => {
   const [siteID, setSiteID] = useState();
@@ -10,17 +13,9 @@ export default () => {
 
   return (
     <Layout>
-      {state.matches('idle') && (
-        <>
-          <button onClick={() => send('LOGIN')}>log in</button>
-        </>
-      )}
+      {state.matches('idle') && <Login handleClick={() => send('LOGIN')} />}
 
-      {state.matches('login') && (
-        <>
-          <p>logging in...</p>
-        </>
-      )}
+      {state.matches('login') && <LoggingIn />}
 
       {state.matches({ configure: 'setSiteID' }) && (
         <form
@@ -50,18 +45,8 @@ export default () => {
 
       {state.matches({ display: 'loaded' }) && (
         <>
-          <ul>
-            {state.context.effects.map(name => (
-              <li key={name}>
-                <Effect
-                  publicURL={state.context.publicURL}
-                  effect={name}
-                  channel={state.context.channel}
-                  userID={state.context.userID}
-                />
-              </li>
-            ))}
-          </ul>
+          <Overlay state={state} />
+          <EffectsList state={state} />
         </>
       )}
     </Layout>
