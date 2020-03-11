@@ -1,4 +1,6 @@
-import React from 'react';
+/** @jsx jsx */
+import { jsx } from 'theme-ui';
+import { Fragment } from 'react';
 import { useMachine } from '@xstate/react';
 import effectMachine from '../state-machines/effect';
 
@@ -14,12 +16,7 @@ const Effect = ({ publicURL, effect, channel, userID }) => {
 
   if (state.matches('invalid') || state.matches('failure')) {
     // TODO add docs
-    return (
-      <p>
-        The serverless function {effect} is not a valid Stream Blitz effect. See
-        the docs for more info.
-      </p>
-    );
+    return null;
   }
 
   if (state.matches('success')) {
@@ -33,8 +30,14 @@ const Effect = ({ publicURL, effect, channel, userID }) => {
     } = state.context;
 
     return (
-      <div>
-        <h3>!{name}</h3>
+      <div
+        sx={{
+          pb: 4,
+          mt: 3,
+          borderBottom: t => `1px solid ${t.colors.ghost}`,
+        }}
+      >
+        <h3 sx={{ m: 0 }}>!{name}</h3>
         <p>{description}</p>
         <details>
           <summary>Effect Details</summary>
@@ -44,28 +47,28 @@ const Effect = ({ publicURL, effect, channel, userID }) => {
             <dt>Description</dt>
             <dd>{description}</dd>
             {image && (
-              <>
+              <Fragment>
                 <dt>Image</dt>
                 <dd>
                   <img src={image} alt="" style={{ width: 200 }} />
                 </dd>
-              </>
+              </Fragment>
             )}
             {audio && (
-              <>
+              <Fragment>
                 <dt>Audio</dt>
                 <dd>
                   {/* TODO: how do we make user-submitted audio accessible? */}
                   {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                   <audio controls src={audio} />
                 </dd>
-              </>
+              </Fragment>
             )}
             {duration && (
-              <>
+              <Fragment>
                 <dt>Duration</dt>
                 <dd>{duration}</dd>
-              </>
+              </Fragment>
             )}
           </dl>
         </details>
@@ -73,7 +76,7 @@ const Effect = ({ publicURL, effect, channel, userID }) => {
     );
   }
 
-  return <pre>{JSON.stringify(state, null, 2)}</pre>;
+  return null;
 };
 
 export default Effect;

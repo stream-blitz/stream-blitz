@@ -4,8 +4,8 @@ export default {
     muted: '#666',
     heading: 'hsl(220, 70%, 5%)',
     background: '#fff',
-    primary: 'hsl(220, 80%, 70%)',
-    ghost: 'hsla(220, 80%, 70%, 0.2)',
+    primary: 'hsl(220, 80%, 40%)',
+    ghost: 'hsla(220, 80%, 40%, 0.2)',
   },
   fonts: {
     body:

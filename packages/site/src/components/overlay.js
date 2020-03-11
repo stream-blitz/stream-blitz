@@ -1,9 +1,10 @@
 /** @jsx jsx */
 import { jsx } from 'theme-ui';
+import Card from './card';
 
 const Overlay = ({ state }) => {
   return (
-    <div sx={{ gridArea: 'widget2' }}>
+    <Card>
       <h2>Your Overlay URL</h2>
       <p>
         Add the following URL as a browser source in your streaming software to
@@ -11,7 +12,7 @@ const Overlay = ({ state }) => {
       </p>
       <input
         type="url"
-        value={`https://api.streamblitz.com/?channel=${state.context.user.name}`}
+        value={`https://api.streamblitz.com/overlay?channel=${state.context.channel}`}
         disabled
         sx={{
           border: t => `1px solid ${t.colors.primary}`,
@@ -22,7 +23,7 @@ const Overlay = ({ state }) => {
           width: '100%',
         }}
       />
-    </div>
+    </Card>
   );
 };
 
