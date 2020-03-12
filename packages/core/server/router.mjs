@@ -6,8 +6,6 @@ import getLogger from './logger.mjs';
 import { sendMessage } from './socket.mjs';
 import { getCommands, runHandler } from './commands.mjs';
 
-let ACTIVE_CHANNELS = new Set();
-
 const logger = getLogger('router');
 
 logger.debug('initializing router...');
@@ -18,20 +16,13 @@ app.use(express.json());
 
 // start the chatbot, then serve the overlay static files
 app.use('/overlay', (req, _res, next) => {
-  if (ACTIVE_CHANNELS.has(req.query.channel)) {
-    next();
-    return;
-  }
-
-  try {
-    ACTIVE_CHANNELS.add(req.query.channel);
-    initializeChatbot([...ACTIVE_CHANNELS]);
-  } catch (error) {
-    console.error(error);
+  if (req.query.channel) {
+    initializeChatbot(req.query.channel);
   }
 
   next();
 });
+
 app.use('/overlay', express.static(join(process.cwd(), 'client')));
 
 app.use(cors());

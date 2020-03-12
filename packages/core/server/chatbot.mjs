@@ -5,11 +5,12 @@ import getLogger from './logger.mjs';
 
 const logger = getLogger('chatbot');
 
-let commands;
+let ACTIVE_CHANNELS = new Set();
+let COMMANDS;
 
-const init = async channels => {
-  logger.debug('initializing the chatbot for @', channels);
-  comfy.Init(process.env.TWITCH_BOT_USER, process.env.TWITCH_OAUTH, channels);
+const init = async channel => {
+  logger.debug('initializing the chatbot for @', channel);
+  comfy.Init(process.env.TWITCH_BOT_USER, process.env.TWITCH_OAUTH, [channel]);
 };
 
 const handleChat = () => {
@@ -33,8 +34,8 @@ const handleChat = () => {
 const handleCommands = () => {
   comfy.onCommand = async (user, command, message, flags, extra) => {
     // load the commands from memory if available or from the DB
-    commands = await getCommands({ channel: extra.channel });
-    const currentCommand = commands.find(c => c.command === command);
+    COMMANDS = await getCommands({ channel: extra.channel });
+    const currentCommand = COMMANDS.find(c => c.command === command);
 
     if (!currentCommand) return;
 
@@ -64,8 +65,13 @@ const handleCommands = () => {
   };
 };
 
-export default async channels => {
-  init(channels);
+export default async channel => {
+  // only initialize the chatbot once per channel
+  if (!channel || ACTIVE_CHANNELS.has(channel)) return;
+
+  ACTIVE_CHANNELS.add(channel);
+
+  init(channel);
   handleChat();
   handleCommands();
 };
