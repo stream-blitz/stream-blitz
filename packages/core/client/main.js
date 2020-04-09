@@ -43,8 +43,8 @@ const handleCommand = async msg => {
     img.classList.add('command-image', 'visible');
     img.src = msg.image;
 
-    const text = cmdDisplay.querySelector('text');
-    text.innerText = `${msg.user} redeemed ${msg.name}`;
+    const text = cmdDisplay.querySelector('.command-text text');
+    text.textContent = `${msg.user} redeemed ${msg.name}`;
 
     await sleep(50);
     cmdDisplay.classList.add('visible');
