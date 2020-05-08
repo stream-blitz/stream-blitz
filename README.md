@@ -39,7 +39,7 @@ Stream Blitz is a service designed to make adding sound effects to your Twitchâ„
 
 3.  Register your serverless function
 
-    Visit your [Stream Blitz dashboard](/) to pull in your effects!
+    Visit your [Stream Blitz dashboard](https://streamblitz.com/) to pull in your effects!
 
 ## API
 
