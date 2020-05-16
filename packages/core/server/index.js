@@ -45,7 +45,7 @@ async function main() {
       },
       {
         server: ws,
-        path: '/subscriptions',
+        path: '/graphql',
       },
     );
 

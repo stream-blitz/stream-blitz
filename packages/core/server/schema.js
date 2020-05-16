@@ -3,42 +3,91 @@ const { getTwitchAccessToken } = require('@jlengstorf/get-twitch-oauth');
 const { gql } = require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
+const { getCommand } = require('./commands');
 
 exports.typeDefs = gql`
   scalar Date
 
   type Query {
-    channel(username: String!): Channel!
+    channel(username: String!): TwitchChannel!
   }
 
-  enum ChannelStatus {
+  enum TwitchChannelStatus {
     LIVE
     OFFLINE
   }
 
-  type Channel {
+  type TwitchChannel {
     id: ID!
     username: String!
     description: String!
-    status: ChannelStatus!
-    stream: Stream
+    status: TwitchChannelStatus!
+    stream: TwitchStream
   }
 
-  type Stream {
+  type TwitchStream {
     id: ID!
     title: String!
     startTime: Date!
   }
 
   type Subscription {
-    chat: ChatMessage!
+    message: TwitchMessage!
   }
 
-  type ChatMessage {
-    displayName: String!
+  interface TwitchMessage {
     message: String!
-    color: String!
-    emotes: [[String!]!]
+    author: TwitchChatAuthor!
+    emotes: [TwitchEmote!]!
+  }
+
+  type TwitchChatMessage implements TwitchMessage {
+    html: String!
+    message: String!
+    author: TwitchChatAuthor!
+    emotes: [TwitchEmote!]!
+  }
+
+  type TwitchChatCommand implements TwitchMessage {
+    command: String!
+    arguments: [String!]!
+    message: String!
+    author: TwitchChatAuthor!
+    emotes: [TwitchEmote!]!
+    handler: StreamBlitzCommand
+  }
+
+  type TwitchEmote {
+    id: ID!
+    name: String!
+    locations: [[Int!]!]!
+    images: TwitchEmoteImages!
+  }
+
+  type TwitchEmoteImages {
+    small: String!
+    medium: String!
+    large: String!
+  }
+
+  enum TwitchChannelRoles {
+    BROADCASTER
+    MODERATOR
+    SUBSCRIBER
+  }
+
+  type TwitchChatAuthor {
+    username: String!
+    roles: [TwitchChannelRoles!]!
+  }
+
+  type StreamBlitzCommand {
+    name: String!
+    message: String
+    description: String
+    audio: String
+    image: String
+    duration: Int!
   }
 `;
 
@@ -84,8 +133,6 @@ exports.createResolvers = pubsub => {
             .catch(err => console.error(err)),
         ]);
 
-        console.log(JSON.stringify({ user, stream }, null, 2));
-
         return {
           id: user.id,
           username: user.login,
@@ -102,8 +149,24 @@ exports.createResolvers = pubsub => {
       },
     },
     Subscription: {
-      chat: {
-        subscribe: () => pubsub.asyncIterator(['CHAT']),
+      message: {
+        subscribe: () => pubsub.asyncIterator(['MESSAGE']),
+      },
+    },
+    TwitchMessage: {
+      __resolveType(data) {
+        return data.command ? 'TwitchChatCommand' : 'TwitchChatMessage';
+      },
+    },
+    TwitchChatCommand: {
+      handler: ({ channel, message, author, arguments, command }) => {
+        return getCommand({
+          channel,
+          author,
+          command,
+          arguments,
+          message,
+        });
       },
     },
   };
