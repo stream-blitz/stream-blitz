@@ -57,6 +57,7 @@ exports.createChatBot = pubsub => {
       message: msg,
       author: parseAuthor(channel, meta),
       emotes: parseEmotes(msg, meta.emotes),
+      time: new Date(parseInt(meta['tmi-sent-ts'])),
     };
 
     if (msg.startsWith('!')) {

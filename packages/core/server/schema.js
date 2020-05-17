@@ -39,6 +39,7 @@ exports.typeDefs = gql`
     message: String!
     author: TwitchChatAuthor!
     emotes: [TwitchEmote!]!
+    time: Date!
   }
 
   type TwitchChatMessage implements TwitchMessage {
@@ -46,6 +47,7 @@ exports.typeDefs = gql`
     message: String!
     author: TwitchChatAuthor!
     emotes: [TwitchEmote!]!
+    time: Date!
   }
 
   type TwitchChatCommand implements TwitchMessage {
@@ -55,6 +57,7 @@ exports.typeDefs = gql`
     author: TwitchChatAuthor!
     emotes: [TwitchEmote!]!
     handler: StreamBlitzCommand
+    time: Date!
   }
 
   type TwitchEmote {
