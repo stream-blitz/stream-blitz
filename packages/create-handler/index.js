@@ -13,9 +13,9 @@ module.exports = sfxHandler => async event => {
     };
   }
 
-  const { user, message, flags, extra } = JSON.parse(event.body);
+  const { message, command, arguments, author, extra } = JSON.parse(event.body);
 
-  const response = sfxHandler({ user, message, flags, extra });
+  const response = sfxHandler({ message, command, arguments, author, extra });
 
   return {
     statusCode: 200,

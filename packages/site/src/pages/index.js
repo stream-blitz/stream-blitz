@@ -4,7 +4,7 @@ import dashboardMachine from '../state-machines/dashboard';
 import Layout from '../components/layout';
 import Login from '../components/login';
 import LoggingIn from '../components/logging-in';
-import Overlay from '../components/overlay';
+// import Overlay from '../components/overlay';
 import LoadingSites from '../components/loading-sites';
 import SiteChooser from '../components/site-chooser';
 import EffectsList from '../components/effects-list';
@@ -26,7 +26,7 @@ export default () => {
 
       {state.matches({ display: 'loaded' }) && (
         <>
-          <Overlay state={state} />
+          {/* <Overlay state={state} /> */}
           <EffectsList state={state} />
         </>
       )}

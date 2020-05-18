@@ -1,25 +1,33 @@
 {
   "name": "@stream-blitz/core",
   "version": "0.0.1",
-  "type": "module",
-  "module": "server/index.mjs",
   "author": "Jason Lengstorf <jason@lengstorf.com> (https://lengstorf.com)",
   "license": "MIT",
   "scripts": {
-    "start": "node --require 'dotenv/config' server/index.mjs"
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "@jlengstorf/get-twitch-oauth": "^1.0.0",
+    "apollo-server-express": "^2.13.1",
     "basic-auth": "^2.0.1",
-    "comfy.js": "^1.0.13",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-jwt": "^5.3.1",
+    "graphql": "^15.0.0",
+    "graphql-subscriptions": "^1.1.0",
+    "graphql-tools": "^5.0.0",
     "jwks-rsa": "^1.6.0",
+    "node-fetch": "^2.6.0",
     "pino": "^5.14.0",
     "pino-pretty": "^3.4.0",
-    "uuid-apikey": "^1.4.6",
-    "ws": "^7.2.0"
+    "subscriptions-transport-ws": "^0.9.16",
+    "tmi.js": "^1.5.0",
+    "uuid-apikey": "^1.4.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }
