@@ -22,12 +22,6 @@ async function main() {
     resolvers,
     uploads: false,
     playground: true,
-    introspection: true,
-
-    // TODO hook into JWTs for auth
-    context: context => {
-      return { auth: { isAuthenticated: true, scope: ['test:*'] } };
-    },
   });
 
   server.applyMiddleware({ app });

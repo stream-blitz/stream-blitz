@@ -3,13 +3,14 @@ const { getTwitchAccessToken } = require('@jlengstorf/get-twitch-oauth');
 const { gql } = require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
-const { getCommand } = require('./commands');
+const { getCommand, getCommands } = require('./commands');
 
 exports.typeDefs = gql`
   scalar Date
 
   type Query {
     channel(username: String!): TwitchChannel!
+    commands(username: String!): [String!]!
   }
 
   enum TwitchChannelStatus {
@@ -149,6 +150,9 @@ exports.createResolvers = pubsub => {
               }
             : null,
         };
+      },
+      commands: (_, { username }) => {
+        return getCommands(username);
       },
     },
     Subscription: {

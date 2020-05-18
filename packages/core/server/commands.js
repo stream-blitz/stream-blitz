@@ -28,6 +28,12 @@ async function getCommandsForChannel(channel) {
   return effects;
 }
 
+exports.getCommands = async channel => {
+  const commands = await getCommandsForChannel(channel);
+
+  return commands.map(({ command }) => `!${command}`);
+};
+
 exports.getCommand = async ({
   channel,
   author,
