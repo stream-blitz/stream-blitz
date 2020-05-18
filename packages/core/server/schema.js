@@ -4,6 +4,7 @@ const { gql } = require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
 const { getCommand, getCommands } = require('./commands');
+const { sendMessage } = require('./chatbot');
 
 exports.typeDefs = gql`
   scalar Date
@@ -166,14 +167,20 @@ exports.createResolvers = pubsub => {
       },
     },
     TwitchChatCommand: {
-      handler: ({ channel, message, author, arguments, command }) => {
-        return getCommand({
+      handler: async ({ channel, message, author, arguments, command }) => {
+        const cmd = await getCommand({
           channel,
           author,
           command,
           arguments,
           message,
         });
+
+        if (cmd.message) {
+          sendMessage({ channel, message: cmd.message });
+        }
+
+        return cmd;
       },
     },
   };

@@ -6,20 +6,32 @@ const {
   getMessageHTML,
 } = require('./util/parse-twitch-chat');
 
-exports.createChatBot = pubsub => {
-  const client = new tmi.Client({
-    connection: {
-      secure: true,
-      reconnect: true,
-    },
-    identity: {
-      username: process.env.TWITCH_BOT_USER,
-      password: process.env.TWITCH_OAUTH,
-    },
-    channels: ['jlengstorf'],
-  });
+let CHAT_CLIENT;
+function getChatClient(channels = ['jlengstorf']) {
+  if (!CHAT_CLIENT) {
+    CHAT_CLIENT =
+      CHAT_CLIENT ||
+      new tmi.Client({
+        connection: {
+          secure: true,
+          reconnect: true,
+        },
+        identity: {
+          username: process.env.TWITCH_BOT_USER,
+          password: process.env.TWITCH_OAUTH,
+        },
+        channels,
+      });
 
-  client.connect();
+    CHAT_CLIENT.connect();
+  }
+
+  return CHAT_CLIENT;
+}
+
+exports.createChatBot = pubsub => {
+  // TODO how do we listen to multiple names?
+  const client = getChatClient();
 
   client.on('subscription', (channel, username, method, message, meta) => {
     // TODO handle subscriptions
@@ -72,4 +84,12 @@ exports.createChatBot = pubsub => {
 
     pubsub.publish('MESSAGE', { message });
   });
+};
+
+exports.sendMessage = ({ channel, message }) => {
+  if (!channel || !message) return;
+
+  const client = getChatClient();
+
+  client.say(channel, message);
 };
