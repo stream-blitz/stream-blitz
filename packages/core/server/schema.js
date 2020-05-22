@@ -1,3 +1,4 @@
+const LRU = require('lru-cache');
 const fetch = require('node-fetch');
 const { getTwitchAccessToken } = require('@jlengstorf/get-twitch-oauth');
 const { gql } = require('apollo-server-express');
@@ -5,6 +6,8 @@ const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
 const { getCommand, getCommands } = require('./commands');
 const { sendMessage } = require('./chatbot');
+
+const recentCommands = new LRU(50);
 
 exports.typeDefs = gql`
   scalar Date
@@ -167,7 +170,14 @@ exports.createResolvers = pubsub => {
       },
     },
     TwitchChatCommand: {
-      handler: async ({ channel, message, author, arguments, command }) => {
+      handler: async ({
+        channel,
+        message,
+        author,
+        arguments,
+        command,
+        time,
+      }) => {
         const cmd = await getCommand({
           channel,
           author,
@@ -177,7 +187,10 @@ exports.createResolvers = pubsub => {
         });
 
         if (cmd.message) {
-          sendMessage({ channel, message: cmd.message });
+          if (recentCommands.has(time)) return;
+
+          recentCommands.set(time, true);
+          sendMessage({ channel, message: `${cmd.message} [sb]` });
         }
 
         return cmd;
