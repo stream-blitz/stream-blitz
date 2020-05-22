@@ -186,7 +186,7 @@ exports.createResolvers = pubsub => {
           message,
         });
 
-        if (cmd.message) {
+        if (cmd?.message) {
           if (recentCommands.has(time)) return;
 
           recentCommands.set(time, true);

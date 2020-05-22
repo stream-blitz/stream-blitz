@@ -69,7 +69,9 @@ exports.getCommand = async ({
       }),
     })
       .then(res => res.json())
-      .catch(err => console.error(err));
+      .catch(err => {
+        throw new Error(err.message);
+      });
 
     return {
       name,
