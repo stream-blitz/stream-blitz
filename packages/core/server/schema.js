@@ -190,7 +190,7 @@ exports.createResolvers = pubsub => {
           if (recentCommands.has(time)) return;
 
           recentCommands.set(time, true);
-          sendMessage({ channel, message: `${cmd.message} [sb]` });
+          sendMessage({ channel, message: cmd.message });
         }
 
         return cmd;
