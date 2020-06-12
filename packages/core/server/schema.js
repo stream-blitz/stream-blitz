@@ -161,6 +161,8 @@ exports.createResolvers = pubsub => {
     },
     Subscription: {
       message: {
+        // filter by connected channel
+        // https://www.apollographql.com/docs/graphql-subscriptions/setup/#filter-subscriptions
         subscribe: () => pubsub.asyncIterator(['MESSAGE']),
       },
     },
