@@ -8,5 +8,12 @@
     "type": "git",
     "url": "https://github.com/stream-blitz/stream-blitz"
   },
-  "license": "MIT"
+  "scripts": {
+    "build": "tsc src/index.ts --outDir . -d",
+    "prepublish": "npm run build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
 }
