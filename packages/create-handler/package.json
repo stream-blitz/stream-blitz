@@ -2,6 +2,7 @@
   "name": "@stream-blitz/create-handler",
   "version": "1.0.0",
   "main": "index.js",
+  "types": "index.d.ts",
   "author": "Jason Lengstorf <jason@lengstorf.com> (https://lengstorf.com)",
   "repository": {
     "type": "git",
