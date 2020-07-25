@@ -4,6 +4,7 @@ const { getTwitchAccessToken } = require('@jlengstorf/get-twitch-oauth');
 const { gql } = require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
+const { withFilter } = require('graphql-subscriptions');
 const { getCommand, getCommands } = require('./commands');
 const { sendMessage } = require('./chatbot');
 
@@ -41,6 +42,7 @@ exports.typeDefs = gql`
   }
 
   interface TwitchMessage {
+    id: ID!
     message: String!
     author: TwitchChatAuthor!
     emotes: [TwitchEmote!]!
@@ -48,6 +50,7 @@ exports.typeDefs = gql`
   }
 
   type TwitchChatMessage implements TwitchMessage {
+    id: ID!
     html: String!
     message: String!
     author: TwitchChatAuthor!
@@ -56,6 +59,7 @@ exports.typeDefs = gql`
   }
 
   type TwitchChatCommand implements TwitchMessage {
+    id: ID!
     command: String!
     arguments: [String!]!
     message: String!
@@ -163,7 +167,12 @@ exports.createResolvers = pubsub => {
       message: {
         // filter by connected channel
         // https://www.apollographql.com/docs/graphql-subscriptions/setup/#filter-subscriptions
-        subscribe: () => pubsub.asyncIterator(['MESSAGE']),
+        subscribe: withFilter(
+          () => pubsub.asyncIterator(['MESSAGE']),
+          (payload, variables) => {
+            return true;
+          },
+        ),
       },
     },
     TwitchMessage: {

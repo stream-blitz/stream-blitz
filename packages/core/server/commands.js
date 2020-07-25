@@ -82,6 +82,7 @@ exports.getCommand = async ({
       duration,
     };
   } catch (error) {
+    console.log(error);
     return null;
   }
 };

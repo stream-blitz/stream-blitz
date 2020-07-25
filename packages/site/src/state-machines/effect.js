@@ -8,9 +8,14 @@ const loadEffectPayload = async ({ url, name, channel, userID }) => {
     method: 'POST',
     mode: 'cors',
     body: JSON.stringify({
-      user: 'StreamBlitz',
+      command: name,
+      arguments: [],
       message: '',
-      flags: {},
+      author: {
+        id: 1,
+        username: 'StreamBlitz',
+        roles: ['BROADCASTER', 'SUBSCRIBER', 'MODERATOR'],
+      },
       extra: { channel },
     }),
   }).then(response => response.json());
