@@ -9,7 +9,7 @@ const loadEffectPayload = async ({ url, name, channel, userID }) => {
     mode: 'cors',
     body: JSON.stringify({
       command: name,
-      arguments: [],
+      args: [],
       message: '',
       author: {
         id: 1,
@@ -71,9 +71,6 @@ const effectMachine = Machine({
     url: undefined,
     name: undefined,
     description: undefined,
-    message: undefined,
-    image: undefined,
-    sound: undefined,
   },
   states: {
     loading: {

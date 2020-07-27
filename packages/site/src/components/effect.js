@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { jsx } from 'theme-ui';
-import { Fragment } from 'react';
 import { useMachine } from '@xstate/react';
 import effectMachine from '../state-machines/effect';
 
@@ -20,14 +19,7 @@ const Effect = ({ publicURL, effect, channel, userID }) => {
   }
 
   if (state.matches('success')) {
-    const {
-      name,
-      message,
-      description,
-      audio,
-      image,
-      duration,
-    } = state.context;
+    const { name, description } = state.context;
 
     return (
       <div
@@ -39,39 +31,6 @@ const Effect = ({ publicURL, effect, channel, userID }) => {
       >
         <h3 sx={{ m: 0 }}>!{name}</h3>
         <p>{description}</p>
-        <details>
-          <summary>Effect Details</summary>
-          <dl>
-            <dt>Chat Message</dt>
-            <dd>{message}</dd>
-            <dt>Description</dt>
-            <dd>{description}</dd>
-            {image && (
-              <Fragment>
-                <dt>Image</dt>
-                <dd>
-                  <img src={image} alt="" style={{ width: 200 }} />
-                </dd>
-              </Fragment>
-            )}
-            {audio && (
-              <Fragment>
-                <dt>Audio</dt>
-                <dd>
-                  {/* TODO: how do we make user-submitted audio accessible? */}
-                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                  <audio controls src={audio} />
-                </dd>
-              </Fragment>
-            )}
-            {duration && (
-              <Fragment>
-                <dt>Duration</dt>
-                <dd>{duration}</dd>
-              </Fragment>
-            )}
-          </dl>
-        </details>
       </div>
     );
   }
