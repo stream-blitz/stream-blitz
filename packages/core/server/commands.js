@@ -38,11 +38,13 @@ exports.getCommand = async ({
   channel,
   author,
   command,
-  arguments,
+  args,
   message: originalChatMessage,
 }) => {
   const commands = await getCommandsForChannel(channel);
   const cmd = commands.find(c => c.command === command);
+
+  console.log({ cmd });
 
   if (!cmd) {
     return null;
@@ -51,17 +53,17 @@ exports.getCommand = async ({
   try {
     const {
       name,
-      message,
-      description,
-      audio,
-      image,
+      message = null,
+      description = '',
+      audio = null,
+      image = null,
       duration = 4,
     } = await fetch(cmd.handler, {
       method: 'POST',
       body: JSON.stringify({
         message: originalChatMessage,
         command,
-        arguments,
+        args,
         author,
         extra: {
           channel,
@@ -70,9 +72,18 @@ exports.getCommand = async ({
     })
       .then(res => res.json())
       .catch(err => {
+        console.log({ err });
         throw new Error(err.message);
       });
 
+    console.log({
+      name,
+      message,
+      description,
+      audio,
+      image,
+      duration,
+    });
     return {
       name,
       message,

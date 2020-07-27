@@ -38,7 +38,7 @@ exports.typeDefs = gql`
   }
 
   type Subscription {
-    message: TwitchMessage!
+    message(channel: String!): TwitchMessage!
   }
 
   interface TwitchMessage {
@@ -61,7 +61,7 @@ exports.typeDefs = gql`
   type TwitchChatCommand implements TwitchMessage {
     id: ID!
     command: String!
-    arguments: [String!]!
+    args: [String!]!
     message: String!
     author: TwitchChatAuthor!
     emotes: [TwitchEmote!]!
@@ -170,7 +170,7 @@ exports.createResolvers = pubsub => {
         subscribe: withFilter(
           () => pubsub.asyncIterator(['MESSAGE']),
           (payload, variables) => {
-            return true;
+            return payload.message.channel === variables.channel;
           },
         ),
       },
@@ -181,19 +181,12 @@ exports.createResolvers = pubsub => {
       },
     },
     TwitchChatCommand: {
-      handler: async ({
-        channel,
-        message,
-        author,
-        arguments,
-        command,
-        time,
-      }) => {
+      handler: async ({ channel, message, author, args, command, time }) => {
         const cmd = await getCommand({
           channel,
           author,
           command,
-          arguments,
+          args,
           message,
         });
 

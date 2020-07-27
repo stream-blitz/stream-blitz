@@ -3,11 +3,10 @@ const TWITCH_CDN_URL = 'https://static-cdn.jtvnw.net/emoticons/v1';
 exports.parseCommand = message => {
   const [cmd, ...args] = message.split(' ');
   const command = cmd.replace('!', '');
-  const arguments = args || [];
 
   return {
     command,
-    arguments,
+    args: args || [],
   };
 };
 

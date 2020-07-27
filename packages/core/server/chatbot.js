@@ -75,10 +75,10 @@ exports.createChatBot = pubsub => {
 
     if (msg.startsWith('!')) {
       // TODO check if this command is in a cooldown period before sending
-      const { command, arguments } = parseCommand(msg);
+      const { command, args } = parseCommand(msg);
 
       message.command = command;
-      message.arguments = arguments;
+      message.args = args;
     } else {
       message.html = getMessageHTML(msg, message.emotes);
     }
