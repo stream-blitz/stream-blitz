@@ -37,7 +37,7 @@ const createHandler = require('@stream-blitz/create-handler');
 exports.handler = createHandler({
   name: 'boop',
   description: 'Do a mischief on a the screen!',
-  handler: ({ message, command, arguments, author, extra }) => {
+  handler: ({ message, command, args, author, extra }) => {
     // only allow moderators to fire this command
     if (!author.roles.includes('MODERATOR')) {
       return;
@@ -45,7 +45,7 @@ exports.handler = createHandler({
 
     console.log(`The full chat message is “${message}”`);
     console.log(`The command called is “${command}”`);
-    console.log(`The arguments for this command are “${arguments.join(', ')}”`);
+    console.log(`The arguments for this command are “${args.join(', ')}”`);
     console.log(`The user who called this command is @${author.username}`);
     console.log(`The Twitch channel where this command should run is ${extra.channel}`);
 
@@ -75,7 +75,7 @@ exports.handler = createHandler({
 | ----------------- | ---------------------------------------------------------------------- |
 | `message`         | Full message as sent to Twitch chat                                    |
 | `command`         | Name of the command that was called                                    |
-| `arguments`       | Array of arguments passed to the command                               |
+| `args`            | Array of arguments passed to the command                               |
 | `author`          | Object with information about the user who called the command          |
 | `author.id`       | Twitch user ID                                                         |
 | `author.username` | Twitch username                                                        |

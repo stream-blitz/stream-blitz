@@ -21,7 +21,7 @@ interface EffectDefinition {
   handler: (commandData: {
     message: string;
     command: string;
-    arguments: string[];
+    args: string[];
     author: Author;
     extra: { channel: string };
   }) => Effect;
@@ -42,9 +42,7 @@ function createHandler({ name, description, handler }: EffectDefinition) {
       };
     }
 
-    const { message, command, arguments: args, author, extra } = JSON.parse(
-      event.body,
-    );
+    const { message, command, args, author, extra } = JSON.parse(event.body);
 
     console.log({
       name,
@@ -52,7 +50,7 @@ function createHandler({ name, description, handler }: EffectDefinition) {
       handler,
       message,
       command,
-      arguments: args,
+      args,
       author,
       extra,
     });
@@ -62,7 +60,7 @@ function createHandler({ name, description, handler }: EffectDefinition) {
       response = handler({
         message,
         command,
-        arguments: args,
+        args,
         author,
         extra,
       });
