@@ -21,7 +21,7 @@
     "graphql-tools": "^6.0.9",
     "jwks-rsa": "^1.6.0",
     "lru-cache": "^5.1.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "pino": "^6.3.2",
     "pino-pretty": "^4.0.0",
     "subscriptions-transport-ws": "^0.9.16",
