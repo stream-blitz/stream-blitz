@@ -6,9 +6,10 @@ const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
 const { withFilter } = require('graphql-subscriptions');
 const { getCommand, getCommands } = require('./commands');
-const { sendMessage } = require('./chatbot');
+const { sendMessage, createChatBot } = require('./chatbot');
+const { logger } = require('./logger');
 
-const recentCommands = new LRU(50);
+const recentMessages = new LRU(50);
 
 exports.typeDefs = gql`
   scalar Date
@@ -168,9 +169,39 @@ exports.createResolvers = pubsub => {
         // filter by connected channel
         // https://www.apollographql.com/docs/graphql-subscriptions/setup/#filter-subscriptions
         subscribe: withFilter(
-          () => pubsub.asyncIterator(['MESSAGE']),
+          (_, variables) => {
+            /*
+             * this is called once per subscription (e.g. each time a GraphQL
+             * client loads and fires of a subscription query)
+             *
+             * we need to know which channel to subscribe to (using the
+             * variables) before we can create the chatbot, but we don’t want to
+             * create a new chatbot on every message, so this is pretty much the
+             * only place where we can create it once per connection
+             */
+            const { channel } = variables;
+            createChatBot(pubsub, channel);
+
+            return pubsub.asyncIterator(['MESSAGE']);
+          },
           (payload, variables) => {
-            return payload.message.channel === variables.channel;
+            // bail if this message is for a different channel
+            if (payload.message.channel !== variables.channel) {
+              return false;
+            }
+
+            // bail if this message has already been sent
+            logger.debug({
+              message: payload.message,
+              skipped: recentMessages.has(payload.message.time),
+            });
+            if (recentMessages.has(payload.message.time)) {
+              return false;
+            }
+
+            recentMessages.set(payload.message.time, true);
+
+            return true;
           },
         ),
       },
@@ -181,7 +212,7 @@ exports.createResolvers = pubsub => {
       },
     },
     TwitchChatCommand: {
-      handler: async ({ channel, message, author, args, command, time }) => {
+      handler: async ({ channel, message, author, args, command }) => {
         const cmd = await getCommand({
           channel,
           author,
@@ -191,10 +222,7 @@ exports.createResolvers = pubsub => {
         });
 
         if (cmd?.message) {
-          if (recentCommands.has(time)) return;
-
-          recentCommands.set(time, true);
-          sendMessage({ channel, message: cmd.message });
+          await sendMessage({ channel, message: cmd.message });
         }
 
         return cmd;
