@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const { logger } = require('./logger');
 
 async function getCommandsForChannel(channel) {
   const { effects } = await fetch(process.env.HASURA_GRAPHQL_URI, {
@@ -44,7 +45,7 @@ exports.getCommand = async ({
   const commands = await getCommandsForChannel(channel);
   const cmd = commands.find(c => c.command === command);
 
-  console.log({ cmd });
+  logger.info({ cmd });
 
   if (!cmd) {
     return null;
@@ -72,11 +73,11 @@ exports.getCommand = async ({
     })
       .then(res => res.json())
       .catch(err => {
-        console.log({ err });
+        logger.info({ err });
         throw new Error(err.message);
       });
 
-    console.log({
+    logger.info({
       name,
       message,
       description,
@@ -93,7 +94,7 @@ exports.getCommand = async ({
       duration,
     };
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     return null;
   }
 };

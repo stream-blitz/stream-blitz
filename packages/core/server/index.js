@@ -2,13 +2,14 @@ require('dotenv').config();
 
 const { createServer } = require('http');
 const express = require('express');
+const pinoHttp = require('pino-http');
 const { PubSub } = require('graphql-subscriptions');
 const { ApolloServer } = require('apollo-server-express');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 const { execute, subscribe } = require('graphql');
 const { makeExecutableSchema } = require('graphql-tools');
-const { createChatBot } = require('./chatbot');
 const { typeDefs, createResolvers } = require('./schema');
+const { logger } = require('./logger');
 
 const PORT = process.env.PORT || 9797;
 
@@ -24,12 +25,14 @@ async function main() {
     playground: true,
   });
 
+  app.use(pinoHttp({ logger, useLevel: 'debug' }));
+
   server.applyMiddleware({ app });
 
   const ws = createServer(app);
 
   ws.listen(PORT, async () => {
-    console.log(`server is running at http://localhost:${PORT}`);
+    logger.info(`server is running at http://localhost:${PORT}`);
 
     new SubscriptionServer(
       {
@@ -42,8 +45,6 @@ async function main() {
         path: '/graphql',
       },
     );
-
-    createChatBot(pubsub);
   });
 }
 
