@@ -5,33 +5,55 @@ const {
   parseEmotes,
   getMessageHTML,
 } = require('./util/parse-twitch-chat');
+const { logger } = require('./logger');
 
-let CHAT_CLIENT;
-function getChatClient(channels = ['jlengstorf']) {
-  if (!CHAT_CLIENT) {
-    CHAT_CLIENT =
-      CHAT_CLIENT ||
-      new tmi.Client({
-        connection: {
-          secure: true,
-          reconnect: true,
-        },
-        identity: {
-          username: process.env.TWITCH_BOT_USER,
-          password: process.env.TWITCH_OAUTH,
-        },
-        channels,
-      });
+const clients = new Map();
 
-    CHAT_CLIENT.connect();
+function getChatClient(channel) {
+  let client;
+  if (clients.has(channel)) {
+    logger.debug(`loading an existing connection for ${channel}`);
+    client = clients.get(channel);
+  } else {
+    logger.debug(`creating a new connection for ${channel}`);
+    client = new tmi.Client({
+      connection: {
+        secure: true,
+        reconnect: true,
+      },
+      identity: {
+        username: process.env.TWITCH_BOT_USER,
+        password: process.env.TWITCH_OAUTH,
+      },
+      channels: [channel],
+    });
+
+    client.on('disconnected', () => {
+      logger.debug(`${channel} disconnected!`);
+      clients.delete(client);
+    });
+
+    clients.set(channel, client);
   }
 
-  return CHAT_CLIENT;
+  if (client.readyState() === 'OPEN') {
+    logger.debug(`client is already connected for ${channel}!`);
+    return client;
+  }
+
+  if (!['CONNECTING', 'OPEN'].includes(client.readyState())) {
+    client.connect();
+  }
+
+  return client;
 }
 
-exports.createChatBot = pubsub => {
-  // TODO how do we listen to multiple names?
-  const client = getChatClient();
+exports.createChatBot = (pubsub, subChannel) => {
+  const client = getChatClient(subChannel);
+
+  // since every page load creates a new connection (and, thus, a new chatbot),
+  // remove previous listeners before adding new ones
+  client.removeAllListeners();
 
   client.on('subscription', (channel, username, method, message, meta) => {
     // TODO handle subscriptions
@@ -64,12 +86,14 @@ exports.createChatBot = pubsub => {
     }
 
     // chat activity always includes author and emote data
+    const time = new Date(parseInt(meta['tmi-sent-ts']));
+
     const message = {
       channel: channel.replace('#', ''),
       message: msg,
       author: parseAuthor(channel, meta),
       emotes: parseEmotes(msg, meta.emotes),
-      time: new Date(parseInt(meta['tmi-sent-ts'])),
+      time,
       id: meta.id,
     };
 
@@ -87,10 +111,11 @@ exports.createChatBot = pubsub => {
   });
 };
 
-exports.sendMessage = ({ channel, message }) => {
+exports.sendMessage = async ({ channel, message }) => {
   if (!channel || !message) return;
+  logger.info({ channel, message });
 
-  const client = getChatClient();
+  const client = await getChatClient(channel);
 
   client.say(channel, message);
 };
