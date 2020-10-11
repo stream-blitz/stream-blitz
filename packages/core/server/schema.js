@@ -130,10 +130,6 @@ exports.createResolvers = pubsub => {
 
         const { access_token } = twitchResult;
 
-        console.log({
-          twitchResult,
-        });
-
         try {
           const [[user], [stream]] = await Promise.all([
             fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
@@ -198,12 +194,16 @@ exports.createResolvers = pubsub => {
              * create a new chatbot on every message, so this is pretty much the
              * only place where we can create it once per connection
              */
-            const { channel } = variables;
-            createChatBot(pubsub, channel);
+            try {
+              creating;
+              const { channel } = variables;
+              createChatBot(pubsub, channel);
 
-            beeline.addContext({ graphqlOperation: 'subscribe' });
-
-            return pubsub.asyncIterator(['MESSAGE']);
+              return pubsub.asyncIterator(['MESSAGE']);
+            } catch (e) {
+              console.error(e.message);
+              console.trace(e);
+            }
           },
           (payload, variables) => {
             // bail if this message is for a different channel
