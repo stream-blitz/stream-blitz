@@ -123,30 +123,41 @@ exports.createResolvers = pubsub => {
     Query: {
       channel: async function channel(_, { username }) {
         beeline.addContext({ twitchUsername: username });
-        const { access_token } = await getTwitchAccessToken();
+        const { access_token } = await getTwitchAccessToken({
+          client_id: process.env.TWITCH_CLIENT_ID,
+          client_secret: process.env.TWITCH_CLIENT_SECRET,
+        });
 
-        const [[user], [stream]] = await Promise.all([
-          fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-              'Client-ID': process.env.TWITCH_CLIENT_ID,
-            },
-          })
-            .then(res => res.json())
-            .then(res => res.data)
-            .catch(err => console.error(err)),
-          fetch(`https://api.twitch.tv/helix/streams?user_login=${username}`, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-              'Client-ID': process.env.TWITCH_CLIENT_ID,
-            },
-          })
-            .then(res => res.json())
-            .then(res => res.data)
-            .catch(err => console.error(err)),
-        ]);
+        try {
+          const [[user], [stream]] = await Promise.all([
+            fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
+              method: 'GET',
+              headers: {
+                Authorization: `Bearer ${access_token}`,
+                'Client-ID': process.env.TWITCH_CLIENT_ID,
+              },
+            })
+              .then(res => res.json())
+              .then(res => res.data)
+              .catch(err => console.error(err)),
+            fetch(
+              `https://api.twitch.tv/helix/streams?user_login=${username}`,
+              {
+                method: 'GET',
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                  'Client-ID': process.env.TWITCH_CLIENT_ID,
+                },
+              },
+            )
+              .then(res => res.json())
+              .then(res => res.data)
+              .catch(err => console.error(err)),
+          ]);
+        } catch (error) {
+          console.error(error.message);
+          console.trace(error);
+        }
 
         return {
           id: user.id,
