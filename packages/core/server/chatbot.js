@@ -16,6 +16,10 @@ function getChatClient(channel) {
     client = clients.get(channel);
   } else {
     logger.debug(`creating a new connection for ${channel}`);
+    console.log({
+      username: process.env.TWITCH_BOT_USER,
+      password: process.env.TWITCH_OAUTH,
+    });
     client = new tmi.Client({
       connection: {
         secure: true,
@@ -49,7 +53,10 @@ function getChatClient(channel) {
 }
 
 exports.createChatBot = (pubsub, subChannel) => {
+  logger.debug('creating a new chatbot client');
   const client = getChatClient(subChannel);
+
+  logger.debug(`client is ${client.readyState()}`);
 
   // since every page load creates a new connection (and, thus, a new chatbot),
   // remove previous listeners before adding new ones
