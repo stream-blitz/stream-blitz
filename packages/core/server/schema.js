@@ -194,15 +194,10 @@ exports.createResolvers = pubsub => {
              * create a new chatbot on every message, so this is pretty much the
              * only place where we can create it once per connection
              */
-            try {
-              const { channel } = variables;
-              createChatBot(pubsub, channel);
+            const { channel } = variables;
+            createChatBot(pubsub, channel);
 
-              return pubsub.asyncIterator(['MESSAGE']);
-            } catch (e) {
-              console.error(e.message);
-              console.trace(e);
-            }
+            return pubsub.asyncIterator(['MESSAGE']);
           },
           (payload, variables) => {
             // bail if this message is for a different channel
@@ -215,6 +210,7 @@ exports.createResolvers = pubsub => {
               message: payload.message,
               skipped: recentMessages.has(payload.message.time),
             });
+
             if (recentMessages.has(payload.message.time)) {
               return false;
             }
