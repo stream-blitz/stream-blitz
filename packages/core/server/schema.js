@@ -211,10 +211,6 @@ exports.createResolvers = pubsub => {
               skipped: recentMessages.has(payload.message.time),
             });
 
-            if (recentMessages.has(payload.message.time)) {
-              return false;
-            }
-
             recentMessages.set(payload.message.time, true);
 
             return true;
