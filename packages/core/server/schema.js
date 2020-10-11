@@ -123,15 +123,15 @@ exports.createResolvers = pubsub => {
     Query: {
       channel: async function channel(_, { username }) {
         beeline.addContext({ twitchUsername: username });
-        const { access_token } = await getTwitchAccessToken({
+        const twitchResult = await getTwitchAccessToken({
           client_id: process.env.TWITCH_CLIENT_ID,
           client_secret: process.env.TWITCH_CLIENT_SECRET,
         });
 
+        const { access_token } = twitchResult;
+
         console.log({
-          access_token,
-          client_id: process.env.TWITCH_CLIENT_ID,
-          client_secret: process.env.TWITCH_CLIENT_SECRET,
+          twitchResult,
         });
 
         try {
