@@ -195,7 +195,6 @@ exports.createResolvers = pubsub => {
              * only place where we can create it once per connection
              */
             try {
-              creating;
               const { channel } = variables;
               createChatBot(pubsub, channel);
 
