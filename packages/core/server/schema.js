@@ -128,6 +128,12 @@ exports.createResolvers = pubsub => {
           client_secret: process.env.TWITCH_CLIENT_SECRET,
         });
 
+        console.log({
+          access_token,
+          client_id: process.env.TWITCH_CLIENT_ID,
+          client_secret: process.env.TWITCH_CLIENT_SECRET,
+        });
+
         try {
           const [[user], [stream]] = await Promise.all([
             fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
@@ -154,24 +160,24 @@ exports.createResolvers = pubsub => {
               .then(res => res.data)
               .catch(err => console.error(err)),
           ]);
+
+          return {
+            id: user.id,
+            username: user.login,
+            description: user.description,
+            status: stream?.type === 'live' ? 'LIVE' : 'OFFLINE',
+            stream: stream
+              ? {
+                  id: stream.id,
+                  title: stream.title,
+                  startTime: new Date(stream.started_at),
+                }
+              : null,
+          };
         } catch (error) {
           console.error(error.message);
           console.trace(error);
         }
-
-        return {
-          id: user.id,
-          username: user.login,
-          description: user.description,
-          status: stream?.type === 'live' ? 'LIVE' : 'OFFLINE',
-          stream: stream
-            ? {
-                id: stream.id,
-                title: stream.title,
-                startTime: new Date(stream.started_at),
-              }
-            : null,
-        };
       },
       commands: (_, { username }) => {
         return getCommands(username);
