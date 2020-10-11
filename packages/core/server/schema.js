@@ -5,6 +5,7 @@ const { gql } = require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
 const { withFilter } = require('graphql-subscriptions');
+const beeline = require('honeycomb-beeline')();
 const { getCommand, getCommands } = require('./commands');
 const { sendMessage, createChatBot } = require('./chatbot');
 const { logger } = require('./logger');
@@ -121,6 +122,7 @@ exports.createResolvers = pubsub => {
     }),
     Query: {
       channel: async function channel(_, { username }) {
+        beeline.addContext({ twitchUsername: username });
         const { access_token } = await getTwitchAccessToken();
 
         const [[user], [stream]] = await Promise.all([
@@ -181,6 +183,8 @@ exports.createResolvers = pubsub => {
              */
             const { channel } = variables;
             createChatBot(pubsub, channel);
+
+            beeline.addContext({ graphqlOperation: 'subscribe' });
 
             return pubsub.asyncIterator(['MESSAGE']);
           },

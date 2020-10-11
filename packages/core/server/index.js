@@ -1,4 +1,10 @@
 require('dotenv').config();
+require('honeycomb-beeline')({
+  writeKey: process.env.HONEYCOMB_API_KEY,
+  dataset: 'stream-blitz-prod', // <= name this whatever you want
+  serviceName: 'stream-blitz-server',
+  /* ... additional optional configuration ... */
+});
 
 const { createServer } = require('http');
 const express = require('express');

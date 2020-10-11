@@ -19,6 +19,7 @@
     "graphql": "^15.3.0",
     "graphql-subscriptions": "^1.1.0",
     "graphql-tools": "^6.2.3",
+    "honeycomb-beeline": "^2.3.1-2",
     "jwks-rsa": "^1.9.0",
     "lru-cache": "^5.1.1",
     "node-fetch": "^2.6.1",
