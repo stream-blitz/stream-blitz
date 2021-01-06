@@ -58,9 +58,22 @@ exports.createChatBot = (pubsub, subChannel) => {
   // remove previous listeners before adding new ones
   client.removeAllListeners();
 
-  client.on('subscription', (channel, username, method, message, meta) => {
-    // TODO handle subscriptions
+  client.on('subscription', (channel, username, method, msg, meta) => {
     // https://github.com/tmijs/docs/blob/gh-pages/_posts/v1.4.2/2019-03-03-Events.md#subscription
+    const time = new Date(parseInt(meta['tmi-sent-ts']));
+
+    const message = {
+      channel: channel.replace('#', ''),
+      message: msg,
+      author: parseAuthor(channel, meta),
+      emotes: parseEmotes(msg, meta.emotes),
+      time,
+      id: meta.id,
+      type: 'SUBSCRIPTION',
+      details: meta['system-msg'],
+    };
+
+    pubsub.publish('MESSAGE', { message });
   });
 
   client.on('resub', (channel, username, months, message, meta, methods) => {

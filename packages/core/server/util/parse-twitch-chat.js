@@ -16,8 +16,8 @@ exports.parseAuthor = (channel, meta) => ({
   roles: [
     meta.mod && 'MODERATOR',
     meta.subscriber && 'SUBSCRIBER',
-    channel.replace('#', '').toLowerCase() === meta.username.toLowerCase() &&
-      'BROADCASTER',
+    channel.replace('#', '').toLowerCase() ===
+      meta['display-name'].toLowerCase() && 'BROADCASTER',
   ].filter(Boolean),
 });
 

@@ -71,6 +71,23 @@ exports.typeDefs = gql`
     time: Date!
   }
 
+  enum TwitchEventTypes {
+    SUBSCRIPTION
+    CHEER
+    RAID
+  }
+
+  type TwitchChatEvent implements TwitchMessage {
+    id: ID!
+    message: String!
+    author: TwitchChatAuthor!
+    emotes: [TwitchEmote!]!
+    time: Date!
+
+    type: TwitchEventTypes!
+    details: String
+  }
+
   type TwitchEmote {
     id: ID!
     name: String!
@@ -220,7 +237,13 @@ exports.createResolvers = pubsub => {
     },
     TwitchMessage: {
       __resolveType(data) {
-        return data.command ? 'TwitchChatCommand' : 'TwitchChatMessage';
+        if (data.command) {
+          return 'TwitchChatCommand';
+        } else if (data.type) {
+          return 'TwitchChatEvent';
+        } else {
+          return 'TwitchChatMessage';
+        }
       },
     },
     TwitchChatCommand: {
